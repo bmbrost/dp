@@ -37,19 +37,54 @@ denom <- a0+sum(dnorm(y[idx],theta.tmp,1))
 p <- c(dnorm(y[idx],theta.tmp,1)/denom,a0/denom)
 z[idx] <- sample(c(theta.tmp,rnorm(1,y[idx],1)),1,prob=p)
 
+###
+### Fit model
+###
 
 # Fit model according to Escobar (1994) Eq. 3
+# Same Gibbs sampler as Neal (2000) Eq. 3.2
+
 source("/Users/brost/Documents/git/DPMixtures/dpmixture.escobar.1994.mcmc.R")
-out1 <- dirichlet.process.mixture.mcmc(y,P0,priors=list(a=0.01,b=0.1),tune=list(a0=0.1),
-  start=list(a0=a0,z=y),n.mcmc=1000)
-hist(out1$z,breaks=1000,ylim=c(0,1000))
-points(y,rep(-15,n),col=rgb(0,0,0,0.25),pch="|",cex=0.75)
-points(z,rep(-15,n),col="red",pch="|",cex=0.75)
+out1 <- dpmixture.escobar.1994.mcmc(y,P0,start=list(a0=a0,z=z),n.mcmc=1000)
+
+mod <- out1
+hist(z,breaks=1000,prob=TRUE,col="red",border="red")
+hist(mod$z,breaks=1000,prob=TRUE,add=TRUE)
+points(y,rep(-0.05,n),col=rgb(0,0,0,0.25),pch="|",cex=0.75)
+points(z,rep(-0.05,n),col="red",pch="|",cex=0.75)
+
+idx <- 79
+plot(mod$z[idx,],type="l");abline(h=z[idx],col="red",lty=2)
+hist(mod$z,breaks=1000,ylim=c(0,500),xlim=c(range(mod$z[idx,])+c(-10,10)))
+hist(mod$z[idx,],breaks=100,col="red",add=TRUE);abline(v=z[idx],col="red",lty=2)
+points(y[idx],-10,pch=19)
+
+which.max(apply(mod$z,1,var))
+
+table(mod$z[,1000])
+z.tab
 
 
+# Fit model according to Neal (2000) Eq. 3.6, Algorithm 2, group update of z
+source("/Users/brost/Documents/git/DPMixtures/dpmixture.neal.2000.eq.3.6.mcmc.R")
+out2 <- dpmixture.neal.2000.eq.3.6.mcmc(y,P0,start=list(a0=a0,z=z),n.mcmc=50000)
 
+mod <- out2
+hist(z,breaks=1000,prob=TRUE,col="red",border="red",ylim=c(0,2))
+hist(mod$z[,40000:50000],breaks=1000,prob=TRUE,add=TRUE)
+points(y,rep(-0.05,n),col=rgb(0,0,0,0.25),pch="|",cex=0.75)
+points(z,rep(-0.05,n),col="red",pch="|",cex=0.75)
 
+idx <- 6
+plot(mod$z[idx,],type="l");abline(h=z[idx],col="red",lty=2)
+hist(mod$z,breaks=1000,ylim=c(0,500),xlim=c(range(mod$z[idx,])+c(-10,10)))
+hist(mod$z[idx,],breaks=100,col="red",add=TRUE);abline(v=z[idx],col="red",lty=2)
+points(y[idx],-10,pch=19)
 
+which.max(apply(mod$z,1,var))
+
+table(mod$z[,1000])
+z.tab
 
 
 
