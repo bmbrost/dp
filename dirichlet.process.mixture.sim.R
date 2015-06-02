@@ -4,24 +4,20 @@ rm(list=ls())
 ### Simulation 1-dimensional Dirichlet process mixture
 ###
 
-
-# Following Escobar (1994)
-
+# Using stick-breaking process
 a0 <- 2  # concentration parameter
 P0 <- c(0,100)  # upper and lower limits to base probability measure
-n <- 1000  # number of observations
+n <- 100  # number of observations
 
-N <- 50  # maximum number of clusters for truncation approximation to DPM
+N <- 50  # maximum number of clusters for truncation approximation
+  # to DPM (Gelman et al. 2014, section 23.2)
 v <- c(rbeta(N-1,1,a0),1)
 pie <- v*c(1,cumprod((1-v[-N])))
 plot(pie)
 
 theta <- runif(N,min(P0),max(P0))  # clusters randomly drawn from P0
-# z <- sample(1:length(theta),n,replace=TRUE,prob=pie)  # cluster assignments for observations
 z <- sample(theta,n,replace=TRUE,prob=pie)  # cluster assignments for observations
-# hist(theta[z],breaks=1000)
 hist(z,breaks=1000)
-
 z.tab <- table(z)
 z.tab
 
@@ -42,7 +38,8 @@ p <- c(dnorm(y[idx],theta.tmp,1)/denom,a0/denom)
 z[idx] <- sample(c(theta.tmp,rnorm(1,y[idx],1)),1,prob=p)
 
 
-source("/Users/brost/Documents/git/Haulouts/dirichlet.process.mixture.mcmc.R")
+# Fit model according to Escobar (1994) Eq. 3
+source("/Users/brost/Documents/git/DPMixtures/dpmixture.escobar.1994.mcmc.R")
 out1 <- dirichlet.process.mixture.mcmc(y,P0,priors=list(a=0.01,b=0.1),tune=list(a0=0.1),
   start=list(a0=a0,z=y),n.mcmc=1000)
 hist(out1$z,breaks=1000,ylim=c(0,1000))
