@@ -1,5 +1,5 @@
 dpmixture.escobar.1994.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
-  
+
   library(MCMCpack)  # for Dirichlet distribution functions
   
   # browser()
@@ -8,6 +8,7 @@ dpmixture.escobar.1994.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
   n <- length(y)  # number of observations
   P0 <- range(y)+c(-10,10)  # redefine P0 to contain support of y plus extra
   F.P0 <- 1/(max(P0)-min(P0))
+  
   z.save <- matrix(0,n,n.mcmc)
   
   ###
@@ -27,7 +28,6 @@ dpmixture.escobar.1994.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
     phi.c <- sort(unique(z))  # unique clusters locations; same ordering as delta.j
     
     for(i in 1:n){
-      y.tmp <- y[i]
       idx <- which(phi.c==z[i])  
       phi.tmp <- phi.c[-idx]
 # Note: unsure if normalizing constant c.norm and p.new are being calculated
@@ -35,9 +35,9 @@ dpmixture.escobar.1994.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
 # fxn <- function(x) {dnorm(x,y.tmp)*dunif(x,min(P0),max(P0))}
 # integrate(fxn, min(P0), max(P0))
 #       c.norm <- a0*F.P0+sum(dnorm(y.tmp,phi.tmp,1))  # normalizing constant, i.e., A(Y)
-      p.old <- dnorm(y.tmp,phi.tmp,1) #/c.norm  # prob of existing phi
+      p.old <- dnorm(y[i],phi.tmp,1) #/c.norm  # prob of existing phi
       p.new <- (a0*F.P0) #/c.norm  # prob of new phi
-      z[i] <- sample(c(phi.tmp,rnorm(1,y.tmp,1)),1,prob=c(p.old,p.new))  # sample phi
+      z[i] <- sample(c(phi.tmp,rnorm(1,y[i],1)),1,prob=c(p.old,p.new))  # sample phi
     }
      
     ###
