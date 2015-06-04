@@ -1,4 +1,4 @@
-dpmixture.neal.2000.eq.3.6.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
+dpmixture.neal.2000.algm.2.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
   
   library(MCMCpack)  # for Dirichlet distribution functions
   library(dplyr)  # dense_rank() for ranking clusters smallest to largest
@@ -22,8 +22,7 @@ dpmixture.neal.2000.eq.3.6.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
     ### Sample z (cluster assignments for observations)
     ###
     
-    # Following Escobar (1994) Eq. 3 
-    # Same Gibbs sampler as Neal (2000) Eq. 3.2
+    # Following Neal (2000), algorithm 2
 
     delta.j <- table(z)  # number of observations per cluster
     phi.c <- sort(unique(z))  # unique clusters; same ordering as delta.j
