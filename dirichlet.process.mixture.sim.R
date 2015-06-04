@@ -26,51 +26,69 @@ y <- rnorm(n,z,1)
 plot(y,rep(1,n),col=rgb(0,0,0,0.25),pch=19)
 points(z,rep(1,n),col="red",pch=19)
 
-# Make sure P0 contains support of y; redefine P0 if necessary
-range(y)
-# P0 <- range(y) + c(-5,5)
-
-idx <- 1
-y.tmp <- y[idx]
-theta.tmp <- setdiff(z,z[idx])
-denom <- a0+sum(dnorm(y[idx],theta.tmp,1))
-p <- c(dnorm(y[idx],theta.tmp,1)/denom,a0/denom)
-z[idx] <- sample(c(theta.tmp,rnorm(1,y[idx],1)),1,prob=p)
 
 ###
 ### Fit model
 ###
 
-# Fit model according to Escobar (1994), Eq. 3; same as Neal (2000), Eq. 3.2
+# Fit model according to Escobar (1994), Eq. 3: Gibbs update
+# Same as Neal (2000), Algorithm 2
 source("/Users/brost/Documents/git/DPMixtures/dpmixture.escobar.1994.mcmc.R")
-out1 <- dpmixture.escobar.1994.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=10000)
+out1 <- dpmixture.escobar.1994.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=1000)
 
-# Fit model according to Neal (2000) Eq. 3.6, Algorithm 2, group update of z
-source("/Users/brost/Documents/git/DPMixtures/dpmixture.neal.2000.eq.3.6.mcmc.R")
-out2 <- dpmixture.neal.2000.eq.3.6.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=10000)
+# Fit model according to Neal (2000), Algorithm 2: Gibbs group update of z
+source("/Users/brost/Documents/git/DPMixtures/dpmixture.neal.2000.algm.2.mcmc.R")
+out2 <- dpmixture.neal.2000.algm.2.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=1000)
+
+# Fit model according to Neal (2000), Algorithm 5: MH update
+source("/Users/brost/Documents/git/DPMixtures/dpmixture.neal.2000.algm.5.mcmc.R")
+out3 <- dpmixture.neal.2000.algm.5.mcmc(y,P0,tune=list(z=0.5),
+  start=list(a0=a0,z=y),n.mcmc=1000)
+
+# Fit model according to Neal (2000), Algorithm 7: MH update
+source("/Users/brost/Documents/git/DPMixtures/dpmixture.neal.2000.algm.7.mcmc.R")
+out4 <- dpmixture.neal.2000.algm.7.mcmc(y,P0,tune=list(z=0.5),
+  start=list(a0=a0,z=y),n.mcmc=1000)
+
+# Fit model according to Neal (2000), Algorithm 8: auxilliary variables
+source("/Users/brost/Documents/git/DPMixtures/dpmixture.neal.2000.algm.8.mcmc.R")
+out5 <- dpmixture.neal.2000.algm.8.mcmc(y,P0,priors=list(m=3),tune=list(z=0.5),
+  start=list(a0=a0,z=z),n.mcmc=1000)
 
 
 mod <- out1
 mod <- out2
+mod <- out3
+mod <- out4
+mod <- out5
+idx <- 1:1000
+idx <- 1:5000
 idx <- 9000:10000
 hist(z,breaks=1000,prob=TRUE,col="red",border="red")
 hist(mod$z[,idx],breaks=1000,prob=TRUE,add=TRUE)
 points(y,rep(-0.05,n),col=rgb(0,0,0,0.25),pch="|",cex=0.75)
 points(z,rep(-0.05,n),col="red",pch="|",cex=0.75)
 
-pt.idx <- 37
+plot(apply(mod$z[,idx],2,min),type="l")
+  
+pt.idx <- 70
 plot(mod$z[pt.idx,idx],type="l");abline(h=z[pt.idx],col="red",lty=2)
 hist(mod$z[,idx],breaks=5000,xlim=c(range(mod$z[pt.idx,])+c(-10,10)),prob=TRUE)
 hist(mod$z[pt.idx,idx],breaks=50,col="red",add=TRUE,border="red",prob=TRUE);abline(v=z[pt.idx],col="red",lty=2)
 points(y[pt.idx],-0.010,pch=19)
 
-which.max(apply(mod$z,1,var))
-
-abline(v=31.5)
-which.min(sapply(y,function(x) dist(c(x,26.0))))
-
-table(mod$z[,10000])
+apply(mod$z[,idx],2,function(x) length(unique(x)))
 z.tab
+
+which.max(apply(mod$z,1,var))
+abline(v=31.5)
+which.min(sapply(y,function(x) dist(c(x,70.0))))
+
+
+table(mod$z[,1000])
+z.tab
+
+
 
 
 
