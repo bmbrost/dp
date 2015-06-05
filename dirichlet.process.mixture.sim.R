@@ -9,17 +9,21 @@ a0 <- 2  # concentration parameter
 P0 <- c(0,100)  # upper and lower limits to base probability measure
 n <- 100  # number of observations
 
+a0*log(n)  # approximates expected number of components
+
 N <- 50  # maximum number of clusters for truncation approximation
   # to DPM (Gelman et al. 2014, section 23.2)
 v <- c(rbeta(N-1,1,a0),1)
 pie <- v*c(1,cumprod((1-v[-N])))
 plot(pie)
 
+
 theta <- runif(N,min(P0),max(P0))  # clusters randomly drawn from P0
 z <- sample(theta,n,replace=TRUE,prob=pie)  # cluster assignments for observations
 hist(z,breaks=1000)
 z.tab <- table(z)
 z.tab
+length(z.tab)
 
 # Generate observations condition on theta, i.e., [y_i|theta_i]
 y <- rnorm(n,z,1)
@@ -55,6 +59,12 @@ source("/Users/brost/Documents/git/DPMixtures/dpmixture.neal.2000.algm.8.mcmc.R"
 out5 <- dpmixture.neal.2000.algm.8.mcmc(y,P0,priors=list(m=3),tune=list(z=0.5),
   start=list(a0=a0,z=z),n.mcmc=1000)
 
+# Fit model using blocked Gibbs sampler 
+source("/Users/brost/Documents/git/DPMixtures/dpmixture.blocked.mcmc.R")
+# hist(rgamma(1000,2,2),breaks=100)
+# hist(rgamma(1000,1,1),breaks=100)
+out5 <- dpmixture.blocked.mcmc(y,P0,priors=list(N=50,r=20,q=10),tune=list(z=0.5),
+    start=list(a0=a0,z=z,pie=pie),n.mcmc=1000)
 
 mod <- out1
 mod <- out2
@@ -68,10 +78,12 @@ hist(z,breaks=1000,prob=TRUE,col="red",border="red")
 hist(mod$z[,idx],breaks=1000,prob=TRUE,add=TRUE)
 points(y,rep(-0.05,n),col=rgb(0,0,0,0.25),pch="|",cex=0.75)
 points(z,rep(-0.05,n),col="red",pch="|",cex=0.75)
+hist(mod$a0[idx],breaks=100);abline(v=a0,col=2,lty=2)
+mean(mod$a0[idx])*log(n)
 
 plot(apply(mod$z[,idx],2,min),type="l")
   
-pt.idx <- 70
+pt.idx <- 56
 plot(mod$z[pt.idx,idx],type="l");abline(h=z[pt.idx],col="red",lty=2)
 hist(mod$z[,idx],breaks=5000,xlim=c(range(mod$z[pt.idx,])+c(-10,10)),prob=TRUE)
 hist(mod$z[pt.idx,idx],breaks=50,col="red",add=TRUE,border="red",prob=TRUE);abline(v=z[pt.idx],col="red",lty=2)
@@ -79,10 +91,11 @@ points(y[pt.idx],-0.010,pch=19)
 
 apply(mod$z[,idx],2,function(x) length(unique(x)))
 z.tab
+length(z.tab)
 
 which.max(apply(mod$z,1,var))
-abline(v=31.5)
-which.min(sapply(y,function(x) dist(c(x,70.0))))
+abline(v=28.5)
+which.min(sapply(y,function(x) dist(c(x,28.5))))
 
 
 table(mod$z[,1000])
