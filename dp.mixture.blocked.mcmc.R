@@ -20,6 +20,7 @@ dpmixture.blocked.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL){
   a0 <- start$a0
   z <- start$z
   sigma <- 1
+  pie <- start$pie
   H <- priors$H
   n <- length(y)  # number of observations
   P0 <- range(y)+c(-10,10)  # redefine P0 to contain support of y plus extra

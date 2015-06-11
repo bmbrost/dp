@@ -9,7 +9,7 @@ stick <- function(n,P0,a0,H){
   # for truncation approximation.
   
   v <- c(rbeta(H-1,1,a0),1)
-  pie <- v*c(1,cumprod((1-v[-N])))
+  pie <- v*c(1,cumprod((1-v[-H])))
   theta <- runif(H,min(P0),max(P0))  # clusters randomly drawn from P0
   z <- sample(theta,n,replace=TRUE,prob=pie)  # cluster assignments for observations  
   list(z=z,theta=theta,pie=pie,v=v,n=n,P0=P0,a0=a0,H=H)  

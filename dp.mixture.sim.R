@@ -6,19 +6,23 @@ library(cluster)
 ### Simulation 1-dimensional Dirichlet process mixture
 ###
 
+source("/Users/brost/Documents/git/DPMixtures/dp.utils.R")  # sim functions
+
+n <- 100  # number of observations to simulate
+a0 <- 2  # concentration parameter
+P0 <- c(0,100)  # lower and upper limits of uniform base measure
+H <- 50  # maximum number of clusters for truncation approximation
+
 # Using stick-breaking process (Gelman et al. 2014, BDA Section 23.2)
-sim1 <- stick(n=100,P0=c(0,100),a0=2,H=50)
-  # P0=lower and upper limits of uniform base measure,
-  # a0=concentration parameter, H=maximum number of clusters for 
-  # truncation approximation
-sim1$a0*log(n)  # approximates expected number of components
+sim1 <- stick(n,P0,a0,H)
+a0*log(n)  # approximates expected number of components
 
 # Using Chinese restaurant process
-sim1 <- polya(n=100,P0=c(0,100),a0=2)
-  # P0=lower and upper limits of uniform base measure,
-  # a0=concentration parameter
-
+sim1 <- crp(n,P0,a0)
+  
 z <- sim1$z  # cluster assignments
+n <- sim1$n
+a0 <- sim1$a0
 hist(z,breaks=1000)
 z.tab <- table(z)
 z.tab
@@ -62,11 +66,12 @@ out5 <- dpmixture.neal.2000.algm.8.mcmc(y,P0,priors=list(m=3),tune=list(z=0.5),
 source("/Users/brost/Documents/git/DPMixtures/dp.mixture.blocked.mcmc.R")
 # hist(rgamma(1000,2,2),breaks=100)
 # hist(rgamma(1000,1,1),breaks=100)
+H <- 50 # Maximum number of clusters for truncation approximation
+start <- list(a0=a0,z=fitted(kmeans(y,rpois(1,10))),pie=rdirichlet(1,rep(1/H,H)),
+  sigma=sigma)
 out6 <- dpmixture.blocked.mcmc(y,P0,
-    priors=list(H=50,r=20,q=10,sigma.l=0,sigma.u=5),
-    tune=list(z=0.5,sigma=0.1),
-    start=list(a0=a0,z=fitted(kmeans(y,rpois(1,10))),pie=pie,sigma=sigma),
-    n.mcmc=1000)
+    priors=list(H=H,r=20,q=10,sigma.l=0,sigma.u=5),
+    tune=list(z=0.5,sigma=0.1),start=start,n.mcmc=1000)
 
 mod <- out1
 mod <- out2
@@ -108,7 +113,6 @@ plot(mod$z[pt.idx,idx],type="l");abline(h=z[pt.idx],col="red",lty=2)
 hist(mod$z[,idx],breaks=5000,xlim=c(range(mod$z[pt.idx,])+c(-10,10)),prob=TRUE)
 hist(mod$z[pt.idx,idx],breaks=50,col="red",add=TRUE,border="red",prob=TRUE);abline(v=z[pt.idx],col="red",lty=2)
 points(y[pt.idx],-0.010,pch=19)
-
 
 which.max(apply(mod$z,1,var))
 abline(v=29.75)
