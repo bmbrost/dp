@@ -1,5 +1,7 @@
 rm(list=ls())
 
+library(cluster)
+
 ###
 ### Simulation 1-dimensional Dirichlet process mixture
 ###
@@ -17,7 +19,6 @@ v <- c(rbeta(N-1,1,a0),1)
 pie <- v*c(1,cumprod((1-v[-N])))
 plot(pie)
 
-
 theta <- runif(N,min(P0),max(P0))  # clusters randomly drawn from P0
 z <- sample(theta,n,replace=TRUE,prob=pie)  # cluster assignments for observations
 hist(z,breaks=1000)
@@ -26,7 +27,8 @@ z.tab
 length(z.tab)
 
 # Generate observations condition on theta, i.e., [y_i|theta_i]
-y <- rnorm(n,z,1)
+sigma <- 1
+y <- rnorm(n,z,sigma)
 plot(y,rep(1,n),col=rgb(0,0,0,0.25),pch=19)
 points(z,rep(1,n),col="red",pch=19)
 
@@ -63,43 +65,48 @@ out5 <- dpmixture.neal.2000.algm.8.mcmc(y,P0,priors=list(m=3),tune=list(z=0.5),
 source("/Users/brost/Documents/git/DPMixtures/dpmixture.blocked.mcmc.R")
 # hist(rgamma(1000,2,2),breaks=100)
 # hist(rgamma(1000,1,1),breaks=100)
-out5 <- dpmixture.blocked.mcmc(y,P0,priors=list(N=50,r=20,q=10),tune=list(z=0.5),
-    start=list(a0=a0,z=z,pie=pie),n.mcmc=1000)
+out6 <- dpmixture.blocked.mcmc(y,P0,
+    priors=list(H=50,r=20,q=10,sigma.l=0,sigma.u=5),
+    tune=list(z=0.5,sigma=0.1),
+    start=list(a0=a0,z=fitted(kmeans(y,rpois(1,10))),pie=pie,sigma=sigma),
+    n.mcmc=1000)
 
 mod <- out1
 mod <- out2
 mod <- out3
 mod <- out4
 mod <- out5
+mod <- out6
 idx <- 1:1000
 idx <- 1:5000
 idx <- 9000:10000
-hist(z,breaks=1000,prob=TRUE,col="red",border="red")
+hist(z,breaks=1000,prob=TRUE,col="red",border="red",ylim=c(0,1))
 hist(mod$z[,idx],breaks=1000,prob=TRUE,add=TRUE)
-points(y,rep(-0.05,n),col=rgb(0,0,0,0.25),pch="|",cex=0.75)
-points(z,rep(-0.05,n),col="red",pch="|",cex=0.75)
+points(y,rep(-0.01,n),col=rgb(0,0,0,0.25),pch="|",cex=0.75)
+points(z,rep(-0.01,n),col="red",pch="|",cex=0.75)
 hist(mod$a0[idx],breaks=100);abline(v=a0,col=2,lty=2)
 mean(mod$a0[idx])*log(n)
+hist(mod$sigma[idx],breaks=100);abline(v=sigma,col=2,lty=2)
 
-plot(apply(mod$z[,idx],2,min),type="l")
-  
-pt.idx <- 56
+plot(apply(mod$z[,idx],2,max),type="l")
+cl.ranks <- apply(mod$z[,idx],2,dense_rank)
+plot(c(mod$z[,idx])[c(cl.ranks)==8],type="l")
+
+hist(c(mod$z[,idx])[c(test)==1],breaks=500,xlim=range(mod$z[idx]),ylim=c(0,5),prob=TRUE)  
+hist(c(mod$z[,idx])[c(test)==5],col=5,breaks=500,add=TRUE,prob=TRUE)  
+
+pt.idx <- 94
 plot(mod$z[pt.idx,idx],type="l");abline(h=z[pt.idx],col="red",lty=2)
 hist(mod$z[,idx],breaks=5000,xlim=c(range(mod$z[pt.idx,])+c(-10,10)),prob=TRUE)
 hist(mod$z[pt.idx,idx],breaks=50,col="red",add=TRUE,border="red",prob=TRUE);abline(v=z[pt.idx],col="red",lty=2)
 points(y[pt.idx],-0.010,pch=19)
 
-apply(mod$z[,idx],2,function(x) length(unique(x)))
-z.tab
-length(z.tab)
+plot(apply(mod$z[,idx],2,function(x) length(unique(x))),type="l")
+abline(h=length(z.tab),col=2,lty=2)
 
 which.max(apply(mod$z,1,var))
-abline(v=28.5)
-which.min(sapply(y,function(x) dist(c(x,28.5))))
-
-
-table(mod$z[,1000])
-z.tab
+abline(v=29.75)
+which.min(sapply(y,function(x) dist(c(x,29.75))))
 
 
 
@@ -107,34 +114,6 @@ z.tab
 
 
 
-
-
-# Using blocked Gibbs sampler per Gelman et al. 2014, section 23.2
-a0 <- 1  # concentration parameter
-P0 <- seq(0,100,1)  # base probability measure; discrete uniform distribution 
-n <- 100  # number of observations
-
-# Generate data according to stick-breaking process
-
-# Discrete uniform base distribution
-N <- 20  # maximum number of clusters for truncation approximation to DPM
-v <- c(rbeta(N-1,1,a0),1)
-pie <- v*c(1,cumprod((1-v[-N])))
-theta <- sample(P0,N,replace=FALSE)  # clusters randomly drawn from P0
-k <- sample(theta,n,replace=TRUE,prob=pie)  # cluster assignments of observations
-hist(k,breaks=P0)
-tab.k <- table(k)
-
-# Continuous uniform base distribution
-N <- 20  # maximum number of clusters for truncation approximation to DPM
-v <- c(rbeta(N-1,1,a0),1)
-pie <- v*c(1,cumprod((1-v[-N])))
-
-theta <- runif(N,min(P0),max(P0))  # clusters randomly drawn from P0
-k <- sample(theta,n,replace=TRUE,prob=pie)  # cluster assignments of observations
-hist(k,breaks=1000)
-# hist(k,breaks=P0)  # for comparison to discrete base distribution
-k.tab <- table(k)
 
 
 
