@@ -39,6 +39,23 @@ crp <- function(n,P0,a0){
   list(z=z[,z],n=n,P0=P0,a0=a0)  
 }
 
+stick.2d <- function(n,P0,a0,H){
+  
+  # Simulate Dirichlet process data in 2 dimensions 
+  # using stick-breaking construction.
+  # See Gelman et al. (2014) BDA, Section 23.2
+  
+  # Arguments: n = number of observations to simulate,
+  # P0 = support of 2-D uniform base probability measure,
+  # a0 = concentration parameter, H = maximum number of clusters
+  # for truncation approximation.
+  
+  v <- c(rbeta(H-1,1,a0),1)
+  pie <- v*c(1,cumprod((1-v[-H])))
+  theta <- cbind(runif(H,min(P0[,1]),max(P0[,1])),runif(H,min(P0[,2]),max(P0[,2])))  # clusters randomly drawn from P0
+  z <- sample(1:H,n,replace=TRUE,prob=pie)  # cluster assignments for observations  
+  list(z=theta[z,],theta=theta,pie=pie,v=v,n=n,P0=P0,a0=a0,H=H)  
+}
 
 polya <- function(n,P0,a0){
   
