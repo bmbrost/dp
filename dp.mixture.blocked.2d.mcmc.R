@@ -29,6 +29,10 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
   sigma.save <- numeric(n.mcmc)  
   keep <- list(sigma=0)
   
+  uz <- paste(z[,1],z[,2])
+  A <- solve(sigma^2*diag(2))
+  tapply(y,uz,function(x),)
+
   A <- solve(sigma^2*diag(2))
   b <- y%*%A
   dt <- as.data.table(cbind(y1=y[,1],y2=y[,2],z1=z[,1],z2=z[,2],b%*%solve(A)))
