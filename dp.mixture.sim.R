@@ -21,8 +21,6 @@ a0*log(n)  # approximates expected number of components
 sim1 <- crp(n,P0,a0)
   
 z <- sim1$z  # cluster assignments
-n <- sim1$n
-a0 <- sim1$a0
 hist(z,breaks=1000)
 z.tab <- table(z)
 z.tab
@@ -66,7 +64,6 @@ out5 <- dpmixture.neal.2000.algm.8.mcmc(y,P0,priors=list(m=3),tune=list(z=0.5),
 source("/Users/brost/Documents/git/DPMixtures/dp.mixture.blocked.mcmc.R")
 # hist(rgamma(1000,2,2),breaks=100)
 # hist(rgamma(1000,1,1),breaks=100)
-H <- 50 # Maximum number of clusters for truncation approximation
 start <- list(a0=a0,z=fitted(kmeans(y,rpois(1,10))),pie=rdirichlet(1,rep(1/H,H)),
   sigma=sigma)
 out6 <- dpmixture.blocked.mcmc(y,P0,
