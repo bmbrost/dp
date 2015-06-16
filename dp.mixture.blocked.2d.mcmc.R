@@ -1,5 +1,9 @@
 dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL){
   
+  ###
+  ### Libraries and Subroutines
+  ###
+  
   library(MCMCpack)  # for Dirichlet distribution functions
   library(data.table)  # for tabulating and summing
   library(dplyr)  # dense_rank() for ranking clusters smallest to largest
@@ -25,39 +29,35 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
   #   cat(paste("\nUsing",n.cores,"cores for parallel processing."))
   
   
-#   browser()
+  ###
+  ### Starting values and priors
+  ###
+  
   a0 <- start$a0
   z <- start$z
   sigma <- start$sigma
   pie <- start$pie
   H <- priors$H
+  
+  
+  ###
+  ###  Setup Variables 
+  ###
+  
+  #   browser()  
   n <- nrow(y)  # number of observations
-    
-  z.save <- array(0,dim=c(n,2,n.mcmc))
-  a0.save <- numeric(n.mcmc)
-  sigma.save <- numeric(n.mcmc)  
-  keep <- list(sigma=0)
-
   dt <- as.data.table(cbind(y1=y[,1],y2=y[,2],z1=z[,1],z2=z[,2]))
   tab <- dt[,.N,by=.(z1,z2)]  
   setkey(tab ,N)
   n.cluster <- tab[,.N]  
   ord <- n.cluster:1
-
   
-#   for(i in 1:length(n.group)){
-#     idx <- which(g==names(n.group)[i])
-#     A <- solve(sigma^2*diag(2))*length(idx)  
-#     b <- colSums(y[idx,]%*%solve(sigma^2*diag(2)))
-#     y.sum[i,] <- t(solve(A)%*%b)  
-#   }
-#   
-#   ord <- order(n.group,decreasing=TRUE)
-#   n.group <- n.group[ord]
-#   y.sum <- y.sum[ord,]
-#   n.theta <- length (n.group)
+  z.save <- array(0,dim=c(n,2,n.mcmc))
+  a0.save <- numeric(n.mcmc)
+  sigma.save <- numeric(n.mcmc)  
+  keep <- list(sigma=0)
 
-  
+    
   ###
   ### Begin MCMC loop
   ###
@@ -71,9 +71,8 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
     ###
     
     # Sampler currently disregards support P0
-   
+# browser()
     mu.0 <- t(sapply(1:n.cluster,function(x) get.mu.0(x,dt,tab,sigma)))
-    
     mu.0 <- cbind(rnorm(n.cluster,mu.0[ord,1],sigma/tab[ord,N]),
       rnorm(n.cluster,mu.0[ord,2],sigma/tab[ord,N]))  
     n.cluster.new <- H-n.cluster
@@ -85,9 +84,7 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
     ### Sample z (cluster assignments)
     ###
     
-#         browser()
-
-    
+    # browser()
     idx <- sapply(1:n,function(x) sample(1:H,1,
       prob=pie*dnorm(y[x,1],mu.0[,1],sigma)*dnorm(y[x,2],mu.0[,2],sigma)))
     dt[,z1:=mu.0[idx,1]]
@@ -97,19 +94,6 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
     ###
     ### Sample sigma (observation error)
     ###
-
-# browser()
-# sigma.star <- rnorm(1,sigma,tune$sigma)
-# if(sigma.star>priors$sigma.l & sigma.star<priors$sigma.u){
-#   mh.star.sigma <- sum(dnorm(y[,1],z[,1],sigma.star,log=TRUE)+
-#     dnorm(y[,2],z[,2],sigma.star,log=TRUE))
-#   mh.0.sigma <- sum(dnorm(y[,1],z[,1],sigma,log=TRUE)+
-#     dnorm(y[,2],z[,2],sigma,log=TRUE))
-#   if(exp(mh.star.sigma-mh.0.sigma)>runif(1)){
-#     sigma <- sigma.star
-#     keep$sigma <- keep$sigma+1
-#   } 
-# }
 
     sigma.star <- rnorm(1,sigma,tune$sigma)
     if(sigma.star>priors$sigma.l & sigma.star<priors$sigma.u){
@@ -135,6 +119,7 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
     tab.tmp <- c(tab[ord,N],rep(0,H-n.cluster-1))
 
     # Update stick-breaking weights
+    
     v <- c(rbeta(H-1,1+tab.tmp,a0+n-cumsum(tab.tmp)),1)
     pie <- v*c(1,cumprod((1-v[-H])))  # mixture component probabilities
 
@@ -152,7 +137,6 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
 
     z.save[,1,k] <- dt[,z1]
     z.save[,2,k] <- dt[,z2]
-#     z.save[,,k] <- z
     a0.save[k] <- a0    
     sigma.save[k] <- sigma
   }
