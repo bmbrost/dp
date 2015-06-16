@@ -81,14 +81,14 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
        
   
     ###
-    ### Sample z (cluster assignments)
+    ### Sample h.t (cluster assignments)
     ###
     
     # browser()
-    idx <- sapply(1:n,function(x) sample(1:H,1,
+    h.t <- sapply(1:n,function(x) sample(1:H,1,
       prob=pie*dnorm(y[x,1],mu.0[,1],sigma)*dnorm(y[x,2],mu.0[,2],sigma)))
-    dt[,z1:=mu.0[idx,1]]
-    dt[,z2:=mu.0[idx,2]]    
+    dt[,z1:=mu.0[h.t,1]]
+    dt[,z2:=mu.0[h.t,2]]    
 
 
     ###
@@ -119,7 +119,6 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
     tab.tmp <- c(tab[ord,N],rep(0,H-n.cluster-1))
 
     # Update stick-breaking weights
-    
     v <- c(rbeta(H-1,1+tab.tmp,a0+n-cumsum(tab.tmp)),1)
     pie <- v*c(1,cumprod((1-v[-H])))  # mixture component probabilities
 
