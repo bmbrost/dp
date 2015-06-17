@@ -1,8 +1,9 @@
 rm(list=ls())
 
 library(cluster)
-library(msm)
-library(pscl)
+# library(msm)
+# library(pscl)
+library(MCMCpack)  # for rdirichlet(...)
 
 source("/Users/brost/Documents/git/DPMixtures/dp.utils.R")  # sim functions
 
@@ -11,7 +12,7 @@ source("/Users/brost/Documents/git/DPMixtures/dp.utils.R")  # sim functions
 ###
 
 # Using stick-breaking process (Gelman et al. 2014, BDA Section 23.2)
-n <- 5000  # number of observations to simulate
+n <- 500  # number of observations to simulate
 a0 <- 1.5  # concentration parameter
 P0 <- cbind(c(-2,2,2,-2,-2),c(-2,-2,2,2,-2))  # 2-D uniform base probability measure
 H <- 50  # maximum number of clusters for truncation approximation
@@ -30,7 +31,6 @@ points(y,pch=19,cex=0.5)
 points(z,pch=19,cex=1,col=rgb(1,0,0,0.15))
 
 
-
 ###
 ### Fit models
 ###
@@ -43,7 +43,7 @@ start <- list(a0=a0,z=z,#z=fitted(kmeans(y,rpois(1,10))),
   sigma=sigma,pie=rdirichlet(1,rep(1/H,H))) #sim1$pie)  # 
 out1 <- dpmixture.blocked.2d.mcmc(y,P0,
   priors=list(H=H,r=20,q=10,sigma.l=0,sigma.u=5),
-  tune=list(z=0.5,sigma=0.01),start=start,n.mcmc=2500)
+  tune=list(z=0.5,sigma=0.01),start=start,n.mcmc=100)
 
 mod <- out1
 idx <- 1:100
@@ -55,7 +55,8 @@ idx <- 9000:10000
 b <- 3*c(-sigma,sigma) # Plot buffer for errors
 plot(0,0,xlim=range(P0[,1])+b,ylim=range(P0[,2])+b,pch="",yaxt="n",xaxt="n",xlab="",ylab="")
 polygon(x=P0[,1],y=P0[,2],col="gray85")
-points(apply(mod$z,2,I),pch=19,cex=0.5,col=rgb(0,0,0,0.15))
+# points(apply(mod$z,2,I),pch=19,cex=0.5,col=rgb(0,0,0,0.15))
+points(mod$z[,1,],mod$z[,2,],pch=19,cex=0.5,col=rgb(0,0,0,0.15))
 points(y,pch=19,cex=0.5,col=3)
 points(z,pch=19,cex=0.5,col=rgb(1,0,0,1))
 
