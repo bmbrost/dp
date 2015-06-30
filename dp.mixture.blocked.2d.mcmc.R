@@ -63,6 +63,7 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
   ###
   
   for (k in 1:n.mcmc) {
+    if(k%%1000==0) cat(k,"");flush.console()
     
     # Following Ishwaran and James (2001); Also Gelman et al. (2014), Section 23.3
     
