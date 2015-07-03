@@ -256,9 +256,6 @@ The latent variable
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
 \mathbf{s}_{t} & \sim & {\cal N}(\boldsymbol{\mu}_{0,h},\sigma^{2}\mathbf{\text{\textbf{I}}})\\

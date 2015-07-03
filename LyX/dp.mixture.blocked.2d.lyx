@@ -317,6 +317,17 @@ where
 \begin_inset Formula $[\boldsymbol{\mu}_{0,h}|\cdot]={\cal N}(\mathbf{s}_{t},\frac{\sigma^{2}}{n_{h}}\text{I})$
 \end_inset
 
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Actually, mean of normal distribution here is the average of all s_t belonging
+ to mu_0,h
+\end_layout
+
+\end_inset
+
 .
  Note that the product (or summation) is over all 
 \begin_inset Formula $\mathbf{s}_{t}$
