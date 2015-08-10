@@ -1,5 +1,7 @@
 dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL){
   
+  t.start <- Sys.time()
+  
   ###
   ### Libraries and Subroutines
   ###
@@ -14,8 +16,10 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
     y.tmp <- dt[z1==tab[x,z1]&z2==tab[x,z2],.(y1,y2)]
     y.tmp <- as.matrix(y.tmp)
     A <- solve(sigma^2*diag(2))*tab[x,N]
+	A.inv <- solve(A)
     b <- colSums(y.tmp%*%solve(sigma^2*diag(2)))
-    t(solve(A)%*%b)
+    t(A.inv%*%b)
+    rnorm(2,A.inv%*%b,sqrt(diag(A.inv)))
   }
   
   
@@ -74,10 +78,10 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
     # Sampler currently disregards support P0
 # browser()
     mu.0 <- t(sapply(1:n.cluster,function(x) get.mu.0(x,dt,tab,sigma)))
-    mu.0 <- cbind(rnorm(n.cluster,mu.0[ord,1],sigma/tab[ord,N]),
-      rnorm(n.cluster,mu.0[ord,2],sigma/tab[ord,N]))  
+    # mu.0 <- cbind(rnorm(n.cluster,mu.0[ord,1],sigma/sqrt(tab[ord,N])),
+      # rnorm(n.cluster,mu.0[ord,2],sigma/sqrt(tab[ord,N])))  
     n.cluster.new <- H-n.cluster
-    mu.0 <- rbind(mu.0,cbind(runif(n.cluster.new,P0[1,1],P0[2,1]),
+    mu.0 <- rbind(mu.0[ord,],cbind(runif(n.cluster.new,P0[1,1],P0[2,1]),
       runif(n.cluster.new,P0[1,2],P0[3,2])))
        
   
@@ -147,6 +151,7 @@ dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL
   
   keep$sigma <- keep$sigma/n.mcmc
   cat(paste("\nsigma acceptance rate:",keep$sigma)) 
+  cat(paste("\nTotal time elapsed:",round(difftime(Sys.time(),t.start,units="mins"),2)))
   list(z=z.save,a0=a0.save,sigma=sigma.save,keep=keep,n.mcmc=n.mcmc)
   
 }

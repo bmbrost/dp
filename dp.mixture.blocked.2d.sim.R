@@ -41,13 +41,15 @@ source("/Users/brost/Documents/git/DPMixtures/dp.mixture.blocked.2d.mcmc.R")
 # hist(rgamma(1000,1,1),breaks=100)
 start <- list(a0=a0,z=z,#z=fitted(kmeans(y,rpois(1,10))),
   sigma=sigma,pie=rdirichlet(1,rep(1/H,H))) #sim1$pie)  # 
+start <- list(a0=a0,z=z,#z=fitted(kmeans(y,rpois(1,10))),
+  sigma=sigma,pie=sim1$pie)  # 
 out1 <- dpmixture.blocked.2d.mcmc(y,P0,
-  priors=list(H=H,r=20,q=10,sigma.l=0,sigma.u=5),
+  priors=list(H=H,r=2,q=2,sigma.l=0,sigma.u=5),
   tune=list(z=0.5,sigma=0.01),start=start,n.mcmc=2000)
 
 mod <- out1
 idx <- 1:100
-idx <- 1:1000
+idx <- 1:2000
 idx <- 1000:2000
 idx <- 1:2500
 idx <- 9000:10000
@@ -56,13 +58,12 @@ idx <- 9000:10000
 b <- 3*c(-sigma,sigma) # Plot buffer for errors
 plot(0,0,xlim=range(P0[,1])+b,ylim=range(P0[,2])+b,pch="",yaxt="n",xaxt="n",xlab="",ylab="")
 polygon(x=P0[,1],y=P0[,2],col="gray85")
-points(mod$z[,1,idx],mod$z[,2,idx],pch=19,cex=0.5,col=rgb(0,0,0,0.15))
+points(mod$z[,1,idx],mod$z[,2,idx],pch=19,cex=0.5,col=rgb(0,0,0,0.0025))
 points(y,pch=19,cex=0.25,col=3)
 points(z,pch=19,cex=0.5,col=rgb(1,0,0,1))
 
 cl <- kmeans(apply(mod$z,2,I),11)
 points(cl$centers,col=4,pch=19)
-
 
 # Concentration parameter
 hist(mod$a0[idx],breaks=100,col="gray90");abline(v=a0,col=2,lty=2) 
