@@ -1,0 +1,622 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\begin_modules
+hanging
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\noindent
+\align center
+
+\shape smallcaps
+\size larger
+Two-dimensional Dirichlet Process Mixture Model Implemented using a Blocked
+ Gibbs Sampler
+\end_layout
+
+\begin_layout Standard
+\align center
+Brian M.
+ Brost
+\end_layout
+
+\begin_layout Standard
+\align center
+17 June 2015
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset CommandInset line
+LatexCommand rule
+width "75col%"
+height "0.5pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+Description
+\end_layout
+
+\begin_layout Standard
+A Dirichlet process mixture model for cluster estimation of 2-dimensional,
+ normally distributed data.
+\end_layout
+
+\begin_layout Subsubsection*
+Implementation
+\end_layout
+
+\begin_layout Standard
+The file dp.mixture.2d.sim.R simulates data according to the model statement
+ presented below, and dp.mixture.2d.mcmc.R contains the MCMC algorithm for model
+ fitting.
+ Model implementation follows the blocked Gibbs sampler approach of Ishwaran
+ and James (2001) and Gelman et al.
+ (2014).
+\end_layout
+
+\begin_layout Subsubsection*
+Model statement
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\mathbf{s}_{t}=(s_{1,t},s_{2,t})^{\prime}$
+\end_inset
+
+, for 
+\begin_inset Formula $t=1,\ldots,T$
+\end_inset
+
+, be observations and 
+\begin_inset Formula $\boldsymbol{\mu}_{0,h}=(\mu_{0,1,h},\mu_{0,2,h})^{\prime}$
+\end_inset
+
+, for 
+\begin_inset Formula $h=1,\ldots,H$
+\end_inset
+
+, be the locations of clusters.
+ The parameter 
+\begin_inset Formula $H$
+\end_inset
+
+ denotes the maximum number of clusters allowed unde the truncation approximatio
+n of Dirichlet process mixture (Gelman et al.
+ 2014).
+ Define 
+\begin_inset Formula $\tilde{S}$
+\end_inset
+
+ to be
+\begin_inset Formula $ $
+\end_inset
+
+ the uniform support of the Dirichlet process (i.e., all possible 
+\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\end_inset
+
+).
+ 
+\begin_inset Formula 
+\begin{eqnarray*}
+\mathbf{s}_{t} & \sim & {\cal N}(\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\mathbf{\text{\textbf{I}}})\\
+h_{t} & \sim & \text{Cat}\left(\frac{\pi_{h}}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}}\right)\\
+\pi_{h} & \sim & \text{Stick}(\theta)\\
+\boldsymbol{\mu}_{0,h} & \sim & \mathbf{\text{Unif}(\tilde{{\cal S}})}\\
+\theta & \sim & \text{Gamma}(r,q)\\
+\sigma & \sim & \text{Unif}(l,u)
+\end{eqnarray*}
+
+\end_inset
+
+The concentration parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+ affects the clustering in the Dirichlet process mixture: smaller values
+ yield fewer clusters with more observations per cluster, whereas larger
+ values yield more clusters with fewer observations per cluster.
+ Note that the lines in this model statement pertaining to 
+\begin_inset Formula $h_{t}$
+\end_inset
+
+, 
+\begin_inset Formula $\pi_{h}$
+\end_inset
+
+, and 
+\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\end_inset
+
+ comprise the stick-breaking representation of the Dirichlet process mixture
+ model, i.e., 
+\begin_inset Formula 
+\begin{eqnarray*}
+\boldsymbol{\mu}_{0,h} & \sim & \mathbf{P}\\
+\mathbf{P} & \sim & \text{DP}(\theta,\mathbf{P}_{0})\\
+\mathbf{P}_{0} & \sim & \mathbf{\text{Unif}(\tilde{{\cal S}})}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+Full conditional distributions
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Cluster locations (
+\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\end_inset
+
+):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+[\boldsymbol{\mu}_{0,h}|\cdot] & \propto & \prod_{\{t:h_{t}=h\}}[\mathbf{s}_{t}|\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}][\boldsymbol{\mu}_{0,h}\mid\tilde{{\cal S}}]\\
+ & \propto & \prod_{\{t:h_{t}=h\}}{\cal N}(\mathbf{s}_{t}|\boldsymbol{\mu}_{0,h_{t}},\sigma^{2})1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left((\mathbf{s}_{t}-\boldsymbol{\mu}_{0,h_{t}})^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}(\mathbf{s}_{t}-\boldsymbol{\mu}_{0,h_{t}})\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left(\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\mathbf{s}_{t}-2\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}+\boldsymbol{\mu}_{0,h_{t}}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left(-2\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}+\boldsymbol{\mu}_{0,h_{t}}^{\prime}\left(\sigma^{2}\mathbf{\textbf{I}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \exp\left\{ -\frac{1}{2}\left(-2\sum_{\{t:h_{t}=h\}}\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}+\boldsymbol{\mu}_{0,h_{t}}^{\prime}\left(n_{h}\left(\sigma^{2}\mathbf{\textbf{I}}\right)^{-1}\right)\boldsymbol{\mu}_{0,h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
+ & = & {\cal N}(\mathbf{A}^{-1}\mathbf{b},\mathbf{A}^{-1})1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}
+\end{eqnarray*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{A}=n_{h}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{b}=\sum_{\{t:h_{t}=h\}}\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}$
+\end_inset
+
+; therefore, 
+\begin_inset Formula $[\boldsymbol{\mu}_{0,h}|\cdot]={\cal N}\left(\frac{1}{n_{h}}\sum_{\{t:h_{t}=h\}}\mathbf{s}_{t},\frac{\sigma^{2}}{n_{h}}\text{I}\right)$
+\end_inset
+
+.
+ Note that the product (or summation) is over all 
+\begin_inset Formula $\mathbf{s}_{t}$
+\end_inset
+
+ that belong to cluster 
+\begin_inset Formula $h$
+\end_inset
+
+ (
+\begin_inset Formula $h_{t}$
+\end_inset
+
+ is a latent class status that indicates membership of observation 
+\begin_inset Formula $\mathbf{s}_{t}$
+\end_inset
+
+ to cluster 
+\begin_inset Formula $h$
+\end_inset
+
+), and 
+\begin_inset Formula $n_{h}$
+\end_inset
+
+ is the number of observations allocated to 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Also note that 
+\begin_inset Quotes els
+\end_inset
+
+proposed' values for 
+\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\end_inset
+
+ not in 
+\begin_inset Formula $\tilde{{\cal S}}$
+\end_inset
+
+ are rejected, i.e., 
+\begin_inset Formula $[\boldsymbol{\mu}_{0,h}|\cdot]={\cal TN}(\mathbf{s}_{t},\frac{\sigma^{2}}{n_{h}}\text{I})_{\tilde{{\cal S}}}$
+\end_inset
+
+.
+\emph on
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\emph on
+Probability mass for cluster location 
+\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\end_inset
+
+ (
+\begin_inset Formula $\pi_{h}$
+\end_inset
+
+):
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+The stick-breaking representation of a Dirichlet process mixture consists
+ of two components, namely a cluster weight and a cluster probability.
+ Let 
+\begin_inset Formula $\eta_{h}$
+\end_inset
+
+ denote the weight assigned to cluster 
+\begin_inset Formula $h$
+\end_inset
+
+, where 
+\begin_inset Formula $\eta_{h}\sim\text{Beta}(1,\theta)$
+\end_inset
+
+.
+ The associated full-conditional is 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula 
+\begin{eqnarray*}
+[\eta_{h}|\cdot] & \sim & \text{Beta}\left(1+n_{h},\theta+\sum_{\tilde{h}=h+1}^{H}n_{\tilde{h}}\right),\text{ for }h=1,\ldots,H-1,
+\end{eqnarray*}
+
+\end_inset
+
+and 
+\begin_inset Formula $\eta_{H}=1$
+\end_inset
+
+.
+ The parameter 
+\begin_inset Formula $n_{h}$
+\end_inset
+
+ denotes the number of observations allocated to cluster 
+\begin_inset Formula $h$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+.
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+Note that 
+\begin_inset Formula $\eta_{h}$
+\end_inset
+
+ is sampled in order of decreasing 
+\begin_inset Formula $n_{h}$
+\end_inset
+
+, i.e., 
+\begin_inset Formula $n_{h}$
+\end_inset
+
+ is sorted largest to smallest and 
+\begin_inset Formula $\eta_{h}$
+\end_inset
+
+ is sampled in sequence.
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+The cluster probabilities (
+\begin_inset Formula $\pi_{h}$
+\end_inset
+
+) are deterministic and calculated as 
+\begin_inset Formula 
+\[
+\pi_{h}=\eta_{h}\prod_{\tilde{h}<h}(1-\eta_{\tilde{h}}).
+\]
+
+\end_inset
+
+The probabilities 
+\begin_inset Formula $\pi_{h}$
+\end_inset
+
+ are also calculated in order of decreasing 
+\begin_inset Formula $n_{h}$
+\end_inset
+
+.
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+See page 553 in Gelman et al.
+ (2014) and Section 5.2 in Ishwaran and James (2001).
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\emph on
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\emph on
+Dirichlet process concentration parameter (
+\begin_inset Formula $\theta$
+\end_inset
+
+):
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\begin{eqnarray*}
+[\theta|\cdot] & \propto & \text{Gamma}(r+H-1,q-\sum_{h=1}^{H-1}\log(1-\eta_{h})).
+\end{eqnarray*}
+
+\end_inset
+
+See page 553 in Gelman et al.
+ (2014).
+ Also see Escobar and West (1995) and West (1997?, white paper) for alternative
+ full-conditionals for 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\emph on
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\emph on
+Latent cluster classification variable (
+\begin_inset Formula $h_{t}$
+\end_inset
+
+):
+\emph default
+
+\begin_inset Formula 
+\begin{eqnarray*}
+[h_{t}|\cdot] & \sim & \left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\right]\left[h_{t}\mid\pi_{h}\right]\\
+ & \sim & \text{Cat}\left(\frac{\pi_{h}\left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\right]}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}\left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,\tilde{h}},\sigma^{2}\right]}\right)\\
+ & \sim & \text{Cat}\left(\frac{\pi_{h}\left({\cal N}\left(\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\mathbf{I}\right)\right)}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}\left({\cal N}\left(\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,\tilde{h}},\sigma^{2}\mathbf{I}\right)\right)}\right)
+\end{eqnarray*}
+
+\end_inset
+
+This update proceeds just as in multinomial sampling; see page 552 in Gelman
+ et al.
+ (2014).
+\emph on
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\emph on
+Error in the observation process (
+\begin_inset Formula $\sigma$
+\end_inset
+
+):
+\emph default
+
+\begin_inset Formula 
+\begin{eqnarray*}
+[\sigma|\cdot] & \propto & \prod_{t=1}^{T}[\mathbf{s}_{t}|\boldsymbol{\mu}_{0,h},\sigma^{2}][\sigma]
+\end{eqnarray*}
+
+\end_inset
+
+The update for 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ proceeds using Metropolis-Hastings.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+References
+\end_layout
+
+\begin_layout Hanging
+Gelman, A., J.B.
+ Carlin, H.S.
+ Stern, D.B.
+ Dunson, A.
+ Vehtari, and D.B.
+ Rubin.
+ 2014.
+ Bayesian data analysis.
+ CRC Press.
+\end_layout
+
+\begin_layout Hanging
+Ishwaran, H., and L.F.
+ James.
+ 2001.
+ Gibbs sampling methods for stick-breaking priors.
+ Journal of the American Statistical Association 96: 161--173.
+\end_layout
+
+\end_body
+\end_document
