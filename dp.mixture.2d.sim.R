@@ -23,13 +23,14 @@ S.tilde <- cbind(c(-2,2,2,-2,-2),c(-2,-2,2,2,-2))  # 2D uniform base probability
 ### See Ishwaran and James (2001), Gelman et al. (2014), Section 23.2
 #############################################################################
 
-T <- 500  # number of observations to simulate
-theta <- 1.5  # Dirichlet process mixture concentration parameter
-H <- 50  # maximum number of clusters for truncation approximation
+T <- 10000  # number of observations to simulate
+theta <- 5  # Dirichlet process mixture concentration parameter
+H <- 100  # maximum number of clusters for truncation approximation
 
 # Prior elicitation for theta
+# theta*log(1+T/theta)  # expected number of clusters (Escobar and West 1995)
 E.m <- theta*(digamma(theta+T)-digamma(theta))  # expected number of clusters
-theta.priors <- DPelicit(T,mean=E.m,std=3,method="JGL")$inp  # Gamma(r,q) prior for theta
+theta.priors <- DPelicit(T,mean=E.m,std=10,method="JGL")$inp  # Gamma(r,q) prior for theta
 
 # Stick-breaking process
 eta <- c(rbeta(H-1,1,theta),1)  # stick-breaking weights
@@ -71,12 +72,14 @@ points(mu.0,pch=19,cex=0.75,col=2)
 
 start <- list(theta=theta,mu.0=mu.0,pie=pie,sigma=sigma)
 priors <- list(H=H,r=theta.priors[1],q=theta.priors[2],sigma.l=0,sigma.u=5)
+# priors <- list(H=H,r=1,q=0.1,sigma.l=0,sigma.u=5)
 tune <- list(sigma=0.025)
 source("/Users/brost/Documents/git/DPMixtures/dp.mixture.2d.mcmc.R")
 out1 <- dpmixture.2d.mcmc(s,S.tilde,priors=priors,tune=tune,start=start,n.mcmc=1000)
 
 mod <- out1
 idx <- 1:1000
+idx <- 1:5000
 
 # True clusters
 b <- 3*c(-sigma,sigma) # Plot buffer for errors
@@ -98,7 +101,7 @@ barplot(table(mod$m))
 hist(mod$sigma[idx],breaks=100);abline(v=sigma,col=2,lty=2)
 
 # Examine individual observation
-pt.idx <- 2
+pt.idx <- 2000
 plot(mod$mu.0[pt.idx,1,idx],mod$mu.0[pt.idx,2,idx],pch=19,col=rgb(0,0,0,0.25),cex=0.25,
 	ylim=range(c(mod$mu.0[pt.idx,2,idx],s[pt.idx,2])),
 	xlim=range(c(mod$mu.0[pt.idx,1,idx],s[pt.idx,1])),asp=1)
@@ -109,7 +112,10 @@ identify(s)
 
 
 
-
+####
+#### Use the simulation code below for the version of the MCMC algorithm
+#### that's commented out at the bottom of dp.mixture.2d.mcmc.R
+####
 
 # rm(list=ls())
 
