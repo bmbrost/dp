@@ -50,6 +50,8 @@ dpmixture.2d.mcmc <- function(s,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
 	ord <- order(tab,decreasing=TRUE)  # clusters ordered by membership
 	samp <- as.numeric(names(tab))[ord]
 
+	mu.0 <- rbind(mu.0,matrix(0,H-m,2))  # Add unoccupied 'dummy' clusters
+
 
 	###
 	### Create receptacles for output
@@ -79,11 +81,15 @@ dpmixture.2d.mcmc <- function(s,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
 		# Sample 'occupied' mu.0 (true location of clusters with non-zero membership)		 
 	    # Sampler currently disregards support P0
 # browser()
-		mu.0 <- t(sapply(samp,function(x) get.mu.0(x,s,ht,sigma)))
+		mu.0[samp,] <- t(sapply(samp,function(x) get.mu.0(x,s,ht,sigma)))
+		# mu.0 <- t(sapply(samp,function(x) get.mu.0(x,s,ht,sigma)))
 		
 		# Sample 'unoccupied' mu.0 (clusters with zero membership) from prior 
-	    mu.0 <- rbind(mu.0,cbind(runif(H-m,min(S.tilde[,1]),max(S.tilde[,1])),
-			runif(H-m,min(S.tilde[,2]),max(S.tilde[,2]))))
+	    mu.0[-samp,] <- cbind(runif(H-m,min(S.tilde[,1]),max(S.tilde[,1])),
+			runif(H-m,min(S.tilde[,2]),max(S.tilde[,2])))
+
+	    # mu.0 <- rbind(mu.0,cbind(runif(H-m,min(S.tilde[,1]),max(S.tilde[,1])),
+			# runif(H-m,min(S.tilde[,2]),max(S.tilde[,2]))))
 
 	    # Note: sampling order matters for the remaining DP updates. Cluster parameters 
 	    # must be sampled in same order as pie, i.e., sorted by decreasing membership
@@ -110,8 +116,14 @@ dpmixture.2d.mcmc <- function(s,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
 		# Sample theta (concentration parameter)
 	    # See Gelman section 23.3, Ishwaran and Zarepour (2000)
        	
-       	theta <- rgamma(1,priors$r+H-1,priors$q-sum(log(1-eta[-H])))  
+       	# theta <- rgamma(1,priors$r+H-1,priors$q-sum(log(1-eta[-H])))  
 
+		tmp <- rbeta(1,theta+1,T)
+		c <- priors$r
+		d <- priors$q
+		p.tmp <- (c+m-1)/(c+m-1+T*(d-log(tmp)))
+		p.tmp <- rbinom(1,1,p.tmp)
+		theta <- ifelse(p.tmp==1,rgamma(1,c+m,d-log(tmp)),rgamma(1,c+m-1,d-log(tmp)))
 		
 		###
 		### Sample sigma (observation error)
@@ -151,9 +163,10 @@ dpmixture.2d.mcmc <- function(s,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
  }
 
 
-
-### This version uses data.table for tabluation. Reference simulation code that's 
-### commented out at the bottom of dp.mixture.blocked.2d.sim.R
+####
+#### This version uses data.table for tabluation. Reference simulation code that's 
+#### commented out at the bottom of dp.mixture.2d.sim.R
+####
 
 # dpmixture.blocked.2d.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL){
   
