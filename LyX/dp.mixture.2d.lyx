@@ -93,7 +93,7 @@ Brian M.
 
 \begin_layout Standard
 \align center
-30 Octover 2015
+10 November 2015
 \end_layout
 
 \begin_layout Standard
@@ -177,7 +177,7 @@ n of Dirichlet process mixture (Gelman et al.
 \begin_inset Formula 
 \begin{eqnarray*}
 \mathbf{s}_{t} & \sim & {\cal N}(\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\mathbf{\text{\textbf{I}}})\\
-h_{t} & \sim & \text{Cat}\left(\frac{\pi_{h}}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}}\right)\\
+h_{t} & \sim & \text{Cat}\left(\pi_{1},\ldots,\pi_{H}\right)\\
 \pi_{h} & \sim & \text{Stick}(\theta)\\
 \boldsymbol{\mu}_{0,h} & \sim & \mathbf{\text{Unif}(\tilde{{\cal S}})}\\
 \theta & \sim & \text{Gamma}(r,q)\\
@@ -482,8 +482,24 @@ The probabilities
 \uwave default
 \noun default
 \color inherit
+The derivation of this full-conditional is as follows:
+\begin_inset Formula 
+\begin{eqnarray*}
+[\eta_{h}|\cdot] & \propto & \prod_{t=1}^{T}\left[h_{t}\mid\pi_{h}\right]^{1_{\{h_{t}=h\}}}\prod_{\tilde{h}=h+1}^{H}\prod_{t=1}^{T}\left[h_{t}\mid\pi_{\tilde{h}}\right]^{1_{\{h_{t}=\tilde{h}\}}}\left[\eta_{h}|\theta_{1},\theta_{2}\right]\\
+ & \propto & \prod_{t=1}^{T}\pi_{h}^{1_{\{h_{t}=h\}}}\prod_{\tilde{h}=h+1}^{H}\prod_{t=1}^{T}\pi_{\tilde{h}}^{1_{\{h_{t}=\tilde{h}\}}}\left[\eta_{h}|\theta_{1},\theta_{2}\right]\\
+ & \propto & \pi_{h}^{\sum_{t}1_{\{h_{t}=h\}}}\prod_{\tilde{h}=h+1}^{H}\pi_{\tilde{h}}^{\sum_{t}1_{\{h_{t}=\tilde{h}\}}}\left[\eta_{h}|\theta_{1},\theta_{2}\right]\\
+ & \propto & \left(\eta_{h}\prod_{l<h}\left(1-\eta_{l}\right)\right){}^{\sum_{t}1_{\{h_{t}=h\}}}\prod_{\tilde{h}=h+1}^{H}\left(\eta_{\tilde{h}}\prod_{l<\tilde{h}}\left(1-\eta_{l}\right)\right)^{\sum_{t}1_{\{h_{t}=\tilde{h}\}}}\eta_{h}^{\theta_{1}-1}\left(1-\eta_{h}\right)^{\theta_{2}-1}\\
+ & \propto & \eta_{h}{}^{\sum_{t}1_{\{h_{t}=h\}}}\prod_{\tilde{h}=h+1}^{H}\left(\prod_{l<\tilde{h}}\left(1-\eta_{l}\right)\right)^{\sum_{t}1_{\{h_{t}=\tilde{h}\}}}\eta_{h}^{\theta_{1}-1}\left(1-\eta_{h}\right)^{\theta_{2}-1}\\
+ & \propto & \eta_{h}{}^{\sum_{t}1_{\{h_{t}=h\}}}\left(1-\eta_{h}\right)^{\sum_{\tilde{h}=h+1}^{H}\sum_{t}1_{\{h_{t}=\tilde{h}\}}}\eta_{h}^{\theta_{1}-1}\left(1-\eta_{h}\right)^{\theta_{2}-1}\\
+ & \propto & \eta_{h}{}^{\sum_{t}1_{\{h_{t}=h\}}+\theta_{1}-1}\left(1-\eta_{h}\right)^{\sum_{\tilde{h}=h+1}^{H}\sum_{t}1_{\{h_{t}=\tilde{h}\}}+\theta_{2}-1}\\
+ & = & \text{Beta}\left(\sum_{t}1_{\{h_{t}=h\}}+\theta_{1},\sum_{\tilde{h}=h+1}^{H}\sum_{t}1_{\{h_{t}=\tilde{h}\}}+\theta_{2}\right)
+\end{eqnarray*}
+
+\end_inset
+
 See page 553 in Gelman et al.
  (2014) and Section 5.2 in Ishwaran and James (2001).
+ 
 \end_layout
 
 \begin_layout Standard
@@ -524,6 +540,7 @@ See page 553 in Gelman et al.
 \end_inset
 
 .
+ Also see Ishwaran and Zarepour (2000) for derivation.
 \end_layout
 
 \begin_layout Standard
