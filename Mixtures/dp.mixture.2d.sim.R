@@ -23,8 +23,8 @@ S.tilde <- cbind(c(-2,2,2,-2,-2),c(-2,-2,2,2,-2))  # 2D uniform base probability
 ### See Ishwaran and James (2001), Gelman et al. (2014), Section 23.2
 #############################################################################
 
-T <- 10000  # number of observations to simulate
-theta <- 5  # Dirichlet process mixture concentration parameter
+T <- 1000  # number of observations to simulate
+theta <- 2  # Dirichlet process mixture concentration parameter
 H <- 100  # maximum number of clusters for truncation approximation
 
 # Prior elicitation for theta
@@ -74,7 +74,7 @@ start <- list(theta=theta,mu.0=mu.0,pie=pie,sigma=sigma)
 priors <- list(H=H,r=theta.priors[1],q=theta.priors[2],sigma.l=0,sigma.u=5)
 # priors <- list(H=H,r=1,q=0.1,sigma.l=0,sigma.u=5)
 tune <- list(sigma=0.025)
-source("/Users/brost/Documents/git/DPMixtures/dp.mixture.2d.mcmc.R")
+source("/Users/brost/Documents/git/DPMixtures/Mixtures/dp.mixture.2d.mcmc.R")
 out1 <- dpmixture.2d.mcmc(s,S.tilde,priors=priors,tune=tune,start=start,n.mcmc=1000)
 
 mod <- out1
