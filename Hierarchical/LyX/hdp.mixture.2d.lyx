@@ -161,8 +161,8 @@ Let
 \begin_inset Formula $H$
 \end_inset
 
- denotes the maximum number of clusters allowed unde the truncation approximatio
-n of Dirichlet process mixture (Gelman et al.
+ denotes the maximum number of clusters allowed under the truncation approximati
+on of Dirichlet process mixture (Gelman et al.
  2014).
  Define 
 \begin_inset Formula $h_{jt}$
@@ -204,10 +204,23 @@ h_{jt} & \sim & \text{Cat}\left(\pi_{j1},\ldots,\pi_{jH}\right)\\
 \end_inset
 
 The concentration parameter 
-\begin_inset Formula $\theta$
+\begin_inset Formula $\theta_{0}$
 \end_inset
 
- affects the clustering in the Dirichlet process mixture: smaller values
+ and 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+ affects the clustering in the 'parent' and 'child' Dirichlet process mixtures,
+ respectively.
+ Smaller values of 
+\begin_inset Formula $\theta_{0}$
+\end_inset
+
+ or 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
  yield fewer clusters with more observations per cluster, whereas larger
  values yield more clusters with fewer observations per cluster.
  Note that the lines in this model statement pertaining to 
@@ -253,7 +266,7 @@ Full conditional distributions
 
 \emph on
 Cluster locations (
-\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
 ):
@@ -275,7 +288,7 @@ Cluster locations (
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{A}=m_{h}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}$
+\begin_inset Formula $\mathbf{A}=n_{\cdot h}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}$
 \end_inset
 
  and 
@@ -283,7 +296,7 @@ where
 \end_inset
 
 ; therefore, 
-\begin_inset Formula $[\boldsymbol{\mu}_{h}|\cdot]={\cal N}\left(\frac{1}{m_{h}}\sum_{j}\sum_{\{t:h_{jt}=h\}}\mathbf{s}_{jt},\frac{\sigma^{2}}{m_{h}}\text{I}\right)$
+\begin_inset Formula $[\boldsymbol{\mu}_{h}|\cdot]={\cal N}\left(\frac{1}{n_{\cdot h}}\sum_{j}\sum_{\{t:h_{jt}=h\}}\mathbf{s}_{jt},\frac{\sigma^{2}}{n_{\cdot h}}\text{I}\right)$
 \end_inset
 
 .
@@ -307,7 +320,7 @@ where
 \begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
-), and 
+), 
 \begin_inset Formula $n_{jh}$
 \end_inset
 
@@ -320,11 +333,10 @@ where
 \end_inset
 
 , and 
-\begin_inset Formula $m_{h}$
+\begin_inset Formula $n_{\cdot h}=\sum_{j=1}^{J}\sum_{t=1}^{T}1_{\{h_{jt}=h\}}$
 \end_inset
 
- is the total number of observations across all groups allocated to cluster
- 
+ is the number of observations across all groups allocated to cluster 
 \begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
@@ -342,7 +354,7 @@ proposed' values for
 \end_inset
 
  are rejected, i.e., 
-\begin_inset Formula $[\boldsymbol{\mu}_{h}|\cdot]={\cal TN}\left(\frac{1}{m_{h}}\sum_{j}\sum_{\{t:h_{jt}=h\}}\mathbf{s}_{jt},\frac{\sigma^{2}}{m_{h}}\text{I}\right)$
+\begin_inset Formula $[\boldsymbol{\mu}_{h}|\cdot]={\cal TN}\left(\frac{1}{n_{\cdot h}}\sum_{j}\sum_{\{t:h_{jt}=h\}}\mathbf{s}_{jt},\frac{\sigma^{2}}{n_{\cdot h}}\text{I}\right)$
 \end_inset
 
 .
@@ -387,8 +399,8 @@ Group-specific probability mass for cluster location
 \uwave off
 \noun off
 \color none
-The stick-breaking construction of Dirichlet processes consistes of two
- components, namely a cluster weight and a cluster probability.
+The stick-breaking construction of Dirichlet processes consists of two component
+s, namely a cluster weight and a cluster probability.
  Let 
 \begin_inset Formula $\eta_{jh}$
 \end_inset
@@ -453,7 +465,7 @@ and
 \end_inset
 
 .
- The varaible 
+ The variable 
 \begin_inset Formula $n_{jh}$
 \end_inset
 
@@ -546,6 +558,10 @@ The group-specific cluster probabilities (
 See page 553 in Gelman et al.
  (2014) and Section 5.2 in Ishwaran and James (2001) for the corresponding
  update in a Dirichlet process mixture model.
+ Also see Ren et al.
+ 2008, Fox et al.
+ 2007, and Fox et al.
+ 2008.
 \end_layout
 
 \begin_layout Standard
@@ -628,7 +644,14 @@ Let
 
 \end_inset
 
-The update proceeds via Metropolis-Hastings, and define 
+It's not clear how this update proceeds, and Ren et al.
+ (2008) and Fox et al.
+ (2007, 2008) are not clear as to 
+\begin_inset Formula $\eta_{0h}$
+\end_inset
+
+ is updated...
+ Define 
 \begin_inset Formula $\eta_{H}=1$
 \end_inset
 
@@ -637,28 +660,6 @@ The update proceeds via Metropolis-Hastings, and define
 \end_inset
 
 .
- Presumably, 
-\begin_inset Formula $\eta_{0h}$
-\end_inset
-
- is sampled in order of decreasing 
-\begin_inset Formula $m_{h}$
-\end_inset
-
-, the total number of observations allocated to 
-\begin_inset Formula $\boldsymbol{\mu}_{h}$
-\end_inset
-
- over all groups.
- In other words, 
-\begin_inset Formula $m_{h}$
-\end_inset
-
- is sorted largest to smallest, and 
-\begin_inset Formula $\eta_{0h}$
-\end_inset
-
- is sampled in sequence.
 
 \family roman
 \series medium
@@ -683,15 +684,7 @@ The update proceeds via Metropolis-Hastings, and define
 
 \end_inset
 
-The probabilities 
-\begin_inset Formula $\pi_{0h}$
-\end_inset
 
- are also calculated in order of decreasing 
-\begin_inset Formula $m_{h}$
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -708,8 +701,8 @@ The probabilities
 \noindent
 
 \emph on
-Dirichlet process concentration parameter (
-\begin_inset Formula $\theta$
+Global Dirichlet process concentration parameter (
+\begin_inset Formula $\theta_{0}$
 \end_inset
 
 ):
@@ -733,6 +726,23 @@ See page 553 in Gelman et al.
 
 .
  Also see Ishwaran and Zarepour (2000) for derivation.
+\emph on
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\emph on
+Group-level Dirichlet process concentration parameter (
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+):
 \end_layout
 
 \begin_layout Standard
@@ -807,6 +817,36 @@ References
 \end_layout
 
 \begin_layout Hanging
+Escobar, M.D.
+ and M.
+ West.
+ 1995.
+ Bayesian density estimation and inference using mixtures.
+ Journal of the American Statistical Association 90:577--588.
+\end_layout
+
+\begin_layout Hanging
+Fox, E.B., E.B.
+ Sudderth, M.I.
+ Jordan, and A.S.
+ Willsky.
+ 2007.
+ Developiing a tempered HDP-HMM for stystems with state persistence.
+ MIT Laboratory for Information & Decision Systems Technical Report P-2777.
+\end_layout
+
+\begin_layout Hanging
+Fox, E.B., E.B.
+ Sudderth, M.I.
+ Jordan, and A.S.
+ Willsky.
+ 2008.
+ An HDP-HMM for systems with state persistence.
+ Proceedings on the 25th International Conference on Machin Learning.
+ Helsinki, Finland.
+\end_layout
+
+\begin_layout Hanging
 Gelman, A., J.B.
  Carlin, H.S.
  Stern, D.B.
@@ -824,6 +864,23 @@ Ishwaran, H., and L.F.
  2001.
  Gibbs sampling methods for stick-breaking priors.
  Journal of the American Statistical Association 96: 161--173.
+\end_layout
+
+\begin_layout Hanging
+Ren, L., D.B.
+ Dunson, and L.
+ Carin.
+ 2008.
+ The dynamic hierarchical Dirichlet process.
+ Proceedings on the 25th International Conference on Machin Learning.
+ Helsinki, Finland.
+\end_layout
+
+\begin_layout Hanging
+West, M.
+ 1997? Hyperparameter estimation in Dirichlet process mixture models.
+ Unpublished report, Institute of Statistics and Decision Sciences, Duke
+ University.
 \end_layout
 
 \end_body
