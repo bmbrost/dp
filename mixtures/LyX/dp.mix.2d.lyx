@@ -123,9 +123,8 @@ Implementation
 \end_layout
 
 \begin_layout Standard
-The file dp.mixture.2d.sim.R simulates data according to the model statement
- presented below, and dp.mixture.2d.mcmc.R contains the MCMC algorithm for model
- fitting.
+The file dp.mix.2d.sim.R simulates data according to the model statement presented
+ below, and dp.mix.2d.mcmc.R contains the MCMC algorithm for model fitting.
  Model implementation follows the blocked Gibbs sampler approach of Ishwaran
  and James (2001) and Gelman et al.
  (2014).
@@ -145,7 +144,7 @@ Let
 \end_inset
 
 , be observations and 
-\begin_inset Formula $\boldsymbol{\mu}_{0,h}=(\mu_{0,1,h},\mu_{0,2,h})^{\prime}$
+\begin_inset Formula $\boldsymbol{\mu}_{h}=(\mu_{1,h},\mu_{2,h})^{\prime}$
 \end_inset
 
 , for 
@@ -169,17 +168,17 @@ n of Dirichlet process mixture (Gelman et al.
 \end_inset
 
  the uniform support of the Dirichlet process (i.e., all possible 
-\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
 ).
  
 \begin_inset Formula 
 \begin{eqnarray*}
-\mathbf{s}_{t} & \sim & {\cal N}(\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\mathbf{\text{\textbf{I}}})\\
+\mathbf{s}_{t} & \sim & {\cal N}(\boldsymbol{\mu}_{h},\sigma^{2}\mathbf{\text{\textbf{I}}})\\
 h_{t} & \sim & \text{Cat}\left(\pi_{1},\ldots,\pi_{H}\right)\\
 \pi_{h} & \sim & \text{Stick}(\theta)\\
-\boldsymbol{\mu}_{0,h} & \sim & \mathbf{\text{Unif}(\tilde{{\cal S}})}\\
+\boldsymbol{\mu}_{h} & \sim & \mathbf{\text{Unif}(\tilde{{\cal S}})}\\
 \theta & \sim & \text{Gamma}(r,q)\\
 \sigma & \sim & \text{Unif}(l,u)
 \end{eqnarray*}
@@ -202,14 +201,14 @@ The concentration parameter
 \end_inset
 
 , and 
-\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
  comprise the stick-breaking representation of the Dirichlet process mixture
  model, i.e., 
 \begin_inset Formula 
 \begin{eqnarray*}
-\boldsymbol{\mu}_{0,h} & \sim & \mathbf{P}\\
+\boldsymbol{\mu}_{h} & \sim & \mathbf{P}\\
 \mathbf{P} & \sim & \text{DP}(\theta,\mathbf{P}_{0})\\
 \mathbf{P}_{0} & \sim & \mathbf{\text{Unif}(\tilde{{\cal S}})}
 \end{eqnarray*}
@@ -227,7 +226,7 @@ Full conditional distributions
 
 \emph on
 Cluster locations (
-\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
 ):
@@ -236,13 +235,13 @@ Cluster locations (
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-[\boldsymbol{\mu}_{0,h}|\cdot] & \propto & \prod_{\{t:h_{t}=h\}}[\mathbf{s}_{t}|\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}][\boldsymbol{\mu}_{0,h}\mid\tilde{{\cal S}}]\\
- & \propto & \prod_{\{t:h_{t}=h\}}{\cal N}(\mathbf{s}_{t}|\boldsymbol{\mu}_{0,h_{t}},\sigma^{2})1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
- & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left((\mathbf{s}_{t}-\boldsymbol{\mu}_{0,h_{t}})^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}(\mathbf{s}_{t}-\boldsymbol{\mu}_{0,h_{t}})\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
- & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left(\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\mathbf{s}_{t}-2\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}+\boldsymbol{\mu}_{0,h_{t}}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
- & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left(-2\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}+\boldsymbol{\mu}_{0,h_{t}}^{\prime}\left(\sigma^{2}\mathbf{\textbf{I}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
- & \propto & \exp\left\{ -\frac{1}{2}\left(-2\sum_{\{t:h_{t}=h\}}\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{0,h_{t}}+\boldsymbol{\mu}_{0,h_{t}}^{\prime}\left(n_{h}\left(\sigma^{2}\mathbf{\textbf{I}}\right)^{-1}\right)\boldsymbol{\mu}_{0,h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}\\
- & = & {\cal N}(\mathbf{A}^{-1}\mathbf{b},\mathbf{A}^{-1})1_{\{\boldsymbol{\mu}_{0,h}\in\tilde{{\cal S}}\}}
+[\boldsymbol{\mu}_{h}|\cdot] & \propto & \prod_{t=1}^{T}[\mathbf{s}_{t}|\boldsymbol{\mu}_{h_{t}},\sigma^{2}]^{1_{\{h_{t}=h\}}}[\boldsymbol{\mu}_{h}\mid\tilde{{\cal S}}]\\
+ & \propto & \prod_{\{t:h_{t}=h\}}{\cal N}(\mathbf{s}_{t}|\boldsymbol{\mu}_{h_{t}},\sigma^{2})1_{\{\boldsymbol{\mu}_{h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left((\mathbf{s}_{t}-\boldsymbol{\mu}_{h_{t}})^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}(\mathbf{s}_{t}-\boldsymbol{\mu}_{h_{t}})\right)\right\} 1_{\{\boldsymbol{\mu}_{h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left(\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\mathbf{s}_{t}-2\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{h_{t}}+\boldsymbol{\mu}_{h_{t}}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \prod_{\{t:h_{t}=h\}}\exp\left\{ -\frac{1}{2}\left(-2\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{h_{t}}+\boldsymbol{\mu}_{h_{t}}^{\prime}\left(\sigma^{2}\mathbf{\textbf{I}}\right)^{-1}\boldsymbol{\mu}_{h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{h}\in\tilde{{\cal S}}\}}\\
+ & \propto & \exp\left\{ -\frac{1}{2}\left(-2\sum_{\{t:h_{t}=h\}}\mathbf{s}_{t}^{\prime}\left(\sigma^{2}\mathbf{\text{\textbf{I}}}\right)^{-1}\boldsymbol{\mu}_{h_{t}}+\boldsymbol{\mu}_{h_{t}}^{\prime}\left(n_{h}\left(\sigma^{2}\mathbf{\textbf{I}}\right)^{-1}\right)\boldsymbol{\mu}_{h_{t}}\right)\right\} 1_{\{\boldsymbol{\mu}_{h}\in\tilde{{\cal S}}\}}\\
+ & = & {\cal N}(\mathbf{A}^{-1}\mathbf{b},\mathbf{A}^{-1})1_{\{\boldsymbol{\mu}_{h}\in\tilde{{\cal S}}\}}
 \end{eqnarray*}
 
 \end_inset
@@ -256,7 +255,7 @@ where
 \end_inset
 
 ; therefore, 
-\begin_inset Formula $[\boldsymbol{\mu}_{0,h}|\cdot]={\cal N}\left(\frac{1}{n_{h}}\sum_{\{t:h_{t}=h\}}\mathbf{s}_{t},\frac{\sigma^{2}}{n_{h}}\text{I}\right)$
+\begin_inset Formula $[\boldsymbol{\mu}_{h}|\cdot]={\cal N}\left(\frac{1}{n_{h}}\sum_{\{t:h_{t}=h\}}\mathbf{s}_{t},\frac{\sigma^{2}}{n_{h}}\text{I}\right)$
 \end_inset
 
 .
@@ -294,7 +293,7 @@ where
 \end_inset
 
 proposed' values for 
-\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
  not in 
@@ -302,7 +301,7 @@ proposed' values for
 \end_inset
 
  are rejected, i.e., 
-\begin_inset Formula $[\boldsymbol{\mu}_{0,h}|\cdot]={\cal TN}(\mathbf{s}_{t},\frac{\sigma^{2}}{n_{h}}\text{I})_{\tilde{{\cal S}}}$
+\begin_inset Formula $[\boldsymbol{\mu}_{h}|\cdot]={\cal TN}(\mathbf{s}_{t},\frac{\sigma^{2}}{n_{h}}\text{I})_{\tilde{{\cal S}}}$
 \end_inset
 
 .
@@ -319,7 +318,7 @@ proposed' values for
 
 \emph on
 Probability mass for cluster location 
-\begin_inset Formula $\boldsymbol{\mu}_{0,h}$
+\begin_inset Formula $\boldsymbol{\mu}_{h}$
 \end_inset
 
  (
@@ -566,9 +565,9 @@ Latent cluster classification variable (
 
 \begin_inset Formula 
 \begin{eqnarray*}
-[h_{t}|\cdot] & \sim & \left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\right]\left[h_{t}\mid\pi_{h}\right]\\
- & \sim & \text{Cat}\left(\frac{\pi_{h}\left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\right]}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}\left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,\tilde{h}},\sigma^{2}\right]}\right)\\
- & \sim & \text{Cat}\left(\frac{\pi_{h}\left({\cal N}\left(\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,h_{t}},\sigma^{2}\mathbf{I}\right)\right)}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}\left({\cal N}\left(\mathbf{s}_{t}\mid\boldsymbol{\mu}_{0,\tilde{h}},\sigma^{2}\mathbf{I}\right)\right)}\right)
+[h_{t}|\cdot] & \sim & \left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{h_{t}},\sigma^{2}\right]\left[h_{t}\mid\pi_{h}\right]\\
+ & \sim & \text{Cat}\left(\frac{\pi_{h}\left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{h_{t}},\sigma^{2}\right]}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}\left[\mathbf{s}_{t}\mid\boldsymbol{\mu}_{\tilde{h}},\sigma^{2}\right]}\right)\\
+ & \sim & \text{Cat}\left(\frac{\pi_{h}\left({\cal N}\left(\mathbf{s}_{t}\mid\boldsymbol{\mu}_{h_{t}},\sigma^{2}\mathbf{I}\right)\right)}{\sum_{\tilde{h}=1}^{H}\pi_{\tilde{h}}\left({\cal N}\left(\mathbf{s}_{t}\mid\boldsymbol{\mu}_{\tilde{h}},\sigma^{2}\mathbf{I}\right)\right)}\right)
 \end{eqnarray*}
 
 \end_inset
@@ -597,7 +596,7 @@ Error in the observation process (
 
 \begin_inset Formula 
 \begin{eqnarray*}
-[\sigma|\cdot] & \propto & \prod_{t=1}^{T}[\mathbf{s}_{t}|\boldsymbol{\mu}_{0,h},\sigma^{2}][\sigma]
+[\sigma|\cdot] & \propto & \prod_{t=1}^{T}[\mathbf{s}_{t}|\boldsymbol{\mu}_{h},\sigma^{2}][\sigma]
 \end{eqnarray*}
 
 \end_inset

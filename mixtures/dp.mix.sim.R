@@ -6,7 +6,7 @@ library(cluster)
 ### Simulation 1-dimensional Dirichlet process mixture
 ###
 
-source("/Users/brost/Documents/git/DirichletProcesses/Mixtures/dp.utils.R")  # sim functions
+source("/Users/brost/Documents/git/DP/mixtures/dp.utils.R")  # sim functions
 
 n <- 100  # number of observations to simulate
 a0 <- 2  # concentration parameter
@@ -38,35 +38,35 @@ points(z,rep(1,n),col="red",pch=19)
 
 # Fit model according to Escobar (1994), Eq. 3: Gibbs update
 # Same as Neal (2000), Algorithm 2
-source("/Users/brost/Documents/git/DirichletProcesses/Mixtures/dp.mixture.escobar.1994.mcmc.R")
-out1 <- dpmixture.escobar.1994.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=1000)
+source("/Users/brost/Documents/git/DP/mixtures/dp.mix.escobar.1994.mcmc.R")
+out1 <- dp.mix.escobar.1994.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=1000)
 
 # Fit model according to Neal (2000), Algorithm 2: Gibbs group update of z
-source("/Users/brost/Documents/git/DirichletProcesses/Mixtures/dp.mixture.neal.2000.algm.2.mcmc.R")
-out2 <- dpmixture.neal.2000.algm.2.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=1000)
+source("/Users/brost/Documents/git/DP/mixtures/dp.mix.neal.2000.algm.2.mcmc.R")
+out2 <- dp.mix.neal.2000.algm.2.mcmc(y,P0,start=list(a0=a0,z=y),n.mcmc=1000)
 
 # Fit model according to Neal (2000), Algorithm 5: MH update
-source("/Users/brost/Documents/git/DirichletProcesses/Mixtures/dp.mixture.neal.2000.algm.5.mcmc.R")
-out3 <- dpmixture.neal.2000.algm.5.mcmc(y,P0,tune=list(z=0.5),
+source("/Users/brost/Documents/git/DP/mixtures/dp.mix.neal.2000.algm.5.mcmc.R")
+out3 <- dp.mix.neal.2000.algm.5.mcmc(y,P0,tune=list(z=0.5),
   start=list(a0=a0,z=y),n.mcmc=1000)
 
 # Fit model according to Neal (2000), Algorithm 7: MH update
-source("/Users/brost/Documents/git/DirichletProcesses/Mixtures/dp.mixture.neal.2000.algm.7.mcmc.R")
-out4 <- dpmixture.neal.2000.algm.7.mcmc(y,P0,tune=list(z=0.5),
+source("/Users/brost/Documents/git/DP/mixtures/dp.mix.neal.2000.algm.7.mcmc.R")
+out4 <- dp.mix.neal.2000.algm.7.mcmc(y,P0,tune=list(z=0.5),
   start=list(a0=a0,z=y),n.mcmc=1000)
 
 # Fit model according to Neal (2000), Algorithm 8: auxilliary variables
-source("/Users/brost/Documents/git/DirichletProcesses/Mixtures/dp.mixture.neal.2000.algm.8.mcmc.R")
-out5 <- dpmixture.neal.2000.algm.8.mcmc(y,P0,priors=list(m=3),tune=list(z=0.5),
+source("/Users/brost/Documents/git/DP/mixtures/dp.mix.neal.2000.algm.8.mcmc.R")
+out5 <- dp.mix.neal.2000.algm.8.mcmc(y,P0,priors=list(m=3),tune=list(z=0.5),
   start=list(a0=a0,z=z),n.mcmc=1000)
 
 # Fit model using blocked Gibbs sampler 
-source("/Users/brost/Documents/git/DirichletProcesses/Mixtures/dp.mixture.blocked.mcmc.R")
+source("/Users/brost/Documents/git/DP/mixtures/dp.mix.blocked.mcmc.R")
 # hist(rgamma(1000,2,2),breaks=100)
 # hist(rgamma(1000,1,1),breaks=100)
 start <- list(a0=a0,z=fitted(kmeans(y,rpois(1,10))),pie=rdirichlet(1,rep(1/H,H)),
   sigma=sigma)
-out6 <- dpmixture.blocked.mcmc(y,P0,
+out6 <- dp.mix.blocked.mcmc(y,P0,
     priors=list(H=H,r=20,q=10,sigma.l=0,sigma.u=5),
     tune=list(z=0.5,sigma=0.1),start=start,n.mcmc=1000)
 

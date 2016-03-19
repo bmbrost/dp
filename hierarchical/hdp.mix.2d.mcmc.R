@@ -1,6 +1,6 @@
 # Hierarchical Dirichlety process mixture model for 2-dimensional data
 
-hdpmixture.2d.mcmc <- function(s,j,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
+hdp.mix.2d.mcmc <- function(s,j,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
   
 	t.start <- Sys.time()
   

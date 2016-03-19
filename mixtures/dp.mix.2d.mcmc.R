@@ -1,6 +1,6 @@
 # Dirichlety process mixture model for 2-dimensional data
 
-dpmixture.2d.mcmc <- function(s,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
+dp.mix.2d.mcmc <- function(s,S.tilde,priors,tune,start,n.mcmc,n.cores=NULL){
   
 	t.start <- Sys.time()
   

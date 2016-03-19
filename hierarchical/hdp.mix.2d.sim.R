@@ -1,5 +1,5 @@
 # Simulate 2-dimensional data for a hierarchical Dirichlet process
-# mixture model. Use hdp.mixture.2d.mcmc.R for model fitting.
+# mixture model. Use hdp.mix.2d.mcmc.R for model fitting.
 
 rm(list=ls())
 
@@ -9,7 +9,7 @@ rm(list=ls())
 library(MCMCpack)  # for rdirichlet(...)
 library(DPpackage)  # for gamma prior elicitation
 
-# source("/Users/brost/Documents/git/DPMixtures/dp.utils.R")  # sim functions
+# source("/Users/brost/Documents/git/DP/mixtures/dp.utils.R")  # sim functions
 
 #############################################################################
 ### Define support of cluster centroids
@@ -133,8 +133,8 @@ priors <- list(H=H,sigma.l=0,sigma.u=5,
 	r.0=1.1,q.0=0.1,  # priors for theta.0; see Teh et al. 2004, HPD UC-Berkeley report
 	r=1,q=1)  # priors for theta; see Teh et al. 2004, HPD UC-Berkeley report
 tune <- list(sigma=0.025)
-source("/Users/brost/Documents/git/DPMixtures/hdp.mixture.2d.mcmc.R")
-out1 <- hdpmixture.2d.mcmc(s.mat,j=rep(1:J,each=T),S.tilde,
+source("/Users/brost/Documents/git/DP/hierarchical/hdp.mix.2d.mcmc.R")
+out1 <- hdp.mix.2d.mcmc(s.mat,j=rep(1:J,each=T),S.tilde,
 	priors=priors,tune=tune,start=start,n.mcmc=1000)
 
 mod <- out1

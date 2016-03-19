@@ -34,10 +34,11 @@ k.tab <- table(k)
 ### Fit model
 ###
 
-source("/Users/bmb/Documents/git/Haulouts/dirichlet.process.prior.mcmc.R")
-source("/Users/brost/Documents/git/Haulouts/dirichlet.process.prior.mcmc.R")
+source("/Users/bmb/Documents/git/DP/priors/dp.prior.mcmc.R")
+source("/Users/brost/Documents/git/DP/priors/dp.prior.mcmc.R")
+
 hist(rgamma(10000,2,.2),breaks=100)
-out1 <- dirichlet.process.prior.mcmc(k,P0,priors=list(a=2,b=2),tune=list(a0=1.5),
+out1 <- dp.prior.mcmc(k,P0,priors=list(a=2,b=2),tune=list(a0=1.5),
    start=list(a0=a0),n.mcmc=10000)
 # boxplot(c(out1$P)*n~rep(as.numeric(names(k.tab)),out1$n.mcmc),pch=19,cex=0.25)
 plot(rep(as.numeric(names(k.tab)),out1$n.mcmc),c(out1$P)*n,pch=19,cex=0.25,col=rgb(0,0,0,0.05))

@@ -1,4 +1,4 @@
-dpmixture.neal.2000.algm.5.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
+dp.mix.neal.2000.algm.5.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
   
   library(MCMCpack)  # for Dirichlet distribution functions
   

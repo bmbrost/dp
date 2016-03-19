@@ -1,4 +1,4 @@
-dirichlet.process.prior.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
+dp.prior.mcmc <- function(y,P0,priors,tune,start,n.mcmc){
   
   library(MCMCpack)  # for Dirichlet distribution functions
   

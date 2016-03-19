@@ -1,5 +1,5 @@
 # Simulate 2-dimensional data for a Dirichlet process mixture.
-# Use dp.mixture.2d.mcmc.R for model fitting.
+# Use dp.mix.2d.mcmc.R for model fitting.
 
 rm(list=ls())
 
@@ -9,7 +9,7 @@ library(cluster)
 library(MCMCpack)  # for rdirichlet(...)
 library(DPpackage)
 
-# source("/Users/brost/Documents/git/DPMixtures/dp.utils.R")  # sim functions
+# source("/Users/brost/Documents/git/DP/mixtures/dp.utils.R")  # sim functions
 
 #############################################################################
 ### Define support of cluster centroids
@@ -74,8 +74,8 @@ start <- list(theta=theta,mu.0=mu.0,pie=pie,sigma=sigma)
 priors <- list(H=H,r=theta.priors[1],q=theta.priors[2],sigma.l=0,sigma.u=5)
 # priors <- list(H=H,r=1,q=0.1,sigma.l=0,sigma.u=5)
 tune <- list(sigma=0.025)
-source("/Users/brost/Documents/git/DPMixtures/Mixtures/dp.mixture.2d.mcmc.R")
-out1 <- dpmixture.2d.mcmc(s,S.tilde,priors=priors,tune=tune,start=start,n.mcmc=1000)
+source("/Users/brost/Documents/git/DP/mixtures/dp.mix.2d.mcmc.R")
+out1 <- dp.mix.2d.mcmc(s,S.tilde,priors=priors,tune=tune,start=start,n.mcmc=1000)
 
 mod <- out1
 idx <- 1:1000

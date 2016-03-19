@@ -1,4 +1,4 @@
-dpmixture.blocked.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL){
+dp.mix.blocked.mcmc <- function(y,P0,priors,tune,start,n.mcmc,n.cores=NULL){
   
   library(MCMCpack)  # for Dirichlet distribution functions
   library(data.table)  # for tabulating and summing
