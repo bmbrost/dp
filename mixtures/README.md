@@ -1,4 +1,5 @@
-# DPMixtures
+# mixtures
+
 MCMC algorithms for implementing Dirichlet process mixture models
 
 - **dp.utils.R**: Utility functions for Dirichlet proceses, e.g., functions for simulating data according to Dirichlet processes.
@@ -11,5 +12,3 @@ MCMC algorithms for implementing Dirichlet process mixture models
 - **dp.mixture.blocked.mcmc.R**: Fit Dirichlet mixture model using blocked Gibbs sampler and the truncation approximation (Ishwaran and James 2001, Section 5; Gelman et al. 2014, BDA Section 23.3)
 - **dp.mixture.blocked.2d.mcmc.R**: Fit Dirichlet mixture model using blocked Gibbs sampler to 2-dimensional data.
 - **dp.mixture.blocked.2d.sim.R**: Simulate Dirichlet process mixture data in 2 dimensions, fit blocked Gibbs sampler models, and examine model results. 
-- **dp.prior.mcmc.R**: Fit Dirichlet process prior model (see Gelman et al. 2014, BDA Section 23.2). Note that this code needs to be vetted.
-- **dp.prior.sim.R**: Simulate data according to model specification of dp.prior.mcmc.R. Note that this code needs to be vetted.
