@@ -15,7 +15,7 @@ stick <- function(n,P0,a0,H){
   list(z=z,theta=theta,pie=pie,v=v,n=n,P0=P0,a0=a0,H=H)  
 }
 
-
+ 
 crp <- function(n,P0,a0){
   
   # Simulate Dirichlet process data using Chinese restaurant process
